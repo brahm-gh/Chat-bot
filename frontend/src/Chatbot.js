@@ -13,10 +13,11 @@ function Chatbot() {
       Handle messages
      */
     const [messages, setMessages] = useState([{
-        text: "Hello, i am the Internet Technologies Chatbot, how can i help you?",
+        text: "Hello, i am the Recipico Chatbot, how can i help you?",
         position: "left"
     }]);
 
+    
     useEffect(() => {
         //if last message is a non-empty question, ask the server
         let lastMessage = messages[messages.length - 1]
@@ -25,7 +26,7 @@ function Chatbot() {
         }
 
         //handle server responses
-        socket.on("answer", (data) => {
+        socket.on("bot_answer", (data) => {
             setMessages([...messages, {text: data, position: "left"}])
         });
 

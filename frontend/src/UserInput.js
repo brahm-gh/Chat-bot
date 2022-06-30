@@ -1,6 +1,7 @@
 import React, {useState} from "react";
 import './UserInput.css'
 
+
 function UserInput(props) {
 
     /*
@@ -21,7 +22,7 @@ function UserInput(props) {
         <div className="bottom_wrapper clearfix">
             <div className="message_input_wrapper">
                 <input className="message_input" value={inputText} onChange={handleChange}
-                       placeholder="Type your message here..."/>
+                        placeholder="Type your message here..."/>
             </div>
             <div className="send_message" onClick={handleSubmit}>
                 <div className="icon"/>
