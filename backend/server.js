@@ -21,7 +21,7 @@ server.listen(5000, function () {
 
 app.use(express.static('../frontend/public'));
 
-// Routing
+/* // Routing
 app.get('/', (req, res)=>{
   res.sendFile('./frontend/public/index.html', {root: __dirname})
 })
@@ -31,7 +31,7 @@ app.get('/chat', (req, res)=>{
 app.use((req, res)=>{
   res.sendFile('error.html', {root: path.join(__dirname, '../frontend/public')})
 })
-
+*/
 
 io.on("connection", (socket) => {
     console.log(`connect ${socket.id}`);
@@ -45,40 +45,14 @@ io.on("connection", (socket) => {
     socket.on("send_message", (data) => {
         socket.to(data.room).emit("receive_message", data);
       });
-    
-    /* 
-    // in the app.js // frontend
-      import { useEffect }from 'react'
-      
-      
 
-      // for index page
-      const[username, setUsername] = useState(" ");
-      const[room, setRoom] = useState(" ");
-
-      const joinRoom = () => { 
-        if(username !== " " && room !== " "){
-            socket.emit("join_room", room);
-        }
-      }
-      
-      [message, setMessage ] = useState("");
-      const send_message () => {
-        socket.emit("send_message", message)
-      }
-
-      useEffect(() => {
-        socket.on("receive_message", (data) => {
-          // do action with data received , publish, alert or anything
-        })
-      }, [socket])
-
-      <input placeholder = "Message ..." 
-      onChange = {(event)=> setMessage(event.target.value)} > </input> 
-      */
     socket.on("disconnect", (reason) => {
         console.log(`disconnect ${socket.id} due to ${reason}`);
+        //start of conversation
+        opening = "Hello, I am your personal AI assistant, what recipe are you looking for?"
+        socket.emit("opening", opening);
     });
+
 
     socket.on("question", (user_input) => {
         console.log("recieved question: " + user_input)
@@ -90,45 +64,46 @@ io.on("connection", (socket) => {
               bot_answer = "I am sorry, I cannot answer  \"" + user_input + "\" yet, Can you paraphrase it?";
               socket.to(user_input.room).emit("bot_answer", bot_answer);
             }
-    });
-});
+    /* //user's question
+    socket.on("question", (data) => {
+        console.log("recieved question: "+data)
+        // place your bot-code here !!!
+        const fs = require('fs')
 
-
-/*
-import { useState } from "react";
-
-const socket = io.connect("http://localhost:5000");
-
-function App(){
-    const[username, setUsername] = useState(" ");
-    const[room, setRoom] = useState(" ");
-
-    const joinRoom = () => { 
-        if(username !== " " && room !== " "){
-            socket.emit("join_room", room);
+        //write the question (keyword) to a text file
+        fs.writeFile('keywords.txt', data, err => {
+          if (err) {
+            console.error(err)
+            return
+          }
+        })
+        //answer of the bot
+        new_answer= "I have found several " + data + " recipes. Here are the results:"
+        socket.emit("new question", new_answer)
+        fs.readFile('sublist.txt', 'utf8', (err, data1) => {
+          if (err) {
+            console.error(err);
+            return;
+          }
+          data1 =  data1.toString().split("\n");
+          return data1;
+        });
+        //looking for the keyword in the file
+        for (let i = 0; i <  data1.length; i++) {
+            if (data1[i] == data) {
+                list = []
+                j = i + 1
+                while (data1[j].length > 30) {
+                    list += data[j]
+                }
+            }
         }
-    }
-
-    return (
-        <div> 
-            <h3> Chat </h3>
-            
-            <input type = "text" placeholder="Here...." 
-            onChange={(event)=> {
-                setUsername(event.target.value);
-            }}/>
-
-            <input type = "text" placeholder="Room ID...." 
-            onChange={(event)=> {
-                setRoom(event.target.value);
-            }}/>
-            <button onClick={joinRoom}> Join a Room</button>
-
-            <chat socket = {socket} username = {username}> room = {room} </chat>
-        </div>
-    )
-}
-
-export default App;
-
-*/
+        //socket.emit()
+        socket.emit("list", list)
+        if (list.length < 1) {
+            answer = "I am dumb, I cannot answer to \"" + data + "\" yet, can you rephrase?";
+            socket.emit("answer", answer);
+        }
+    });*/
+  }); 
+}); 
