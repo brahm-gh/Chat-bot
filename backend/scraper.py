@@ -164,8 +164,5 @@ for url in sublist:
             print('no value')
 
 
-
-
-
 print(ingredients)
 print(instructions)

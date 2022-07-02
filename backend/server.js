@@ -36,74 +36,41 @@ app.use((req, res)=>{
 io.on("connection", (socket) => {
     console.log(`connect ${socket.id}`);
 
+
     //  when a user joins the chat 
     socket.on("join_room", (data) => {
         socket.join(data);
         console.log(`User with ID: ${socket.id} joined room: ${data}`);
+        // Opening the Chat, when the user joins the Chat
+        const opening = 'Hello, I am your personal AI assistant, what recipe are you looking for?'
+        socket.emit("opening", opening)
       });
 
+
+    // receive the user message --> then shows it in the chat
     socket.on("send_message", (data) => {
         socket.to(data.room).emit("receive_message", data);
       });
 
-    socket.on("disconnect", (reason) => {
-        console.log(`disconnect ${socket.id} due to ${reason}`);
-        //start of conversation
-        opening = "Hello, I am your personal AI assistant, what recipe are you looking for?"
-        socket.emit("opening", opening);
-    });
 
-
-    socket.on("question", (user_input) => {
+    socket.on("user_input", (user_input) => {
         console.log("recieved question: " + user_input)
         // place your bot-code here !!!
-        const bot_answer = questions_list[user_input.toLowerCase()];
+        const bot_answer = questions_list[user_input.toLowerCase()];  // This is the remaining part only
             if (bot_answer) {
               socket.to(user_input.room).emit("bot_answer", bot_answer); 
             }else{
               bot_answer = "I am sorry, I cannot answer  \"" + user_input + "\" yet, Can you paraphrase it?";
               socket.to(user_input.room).emit("bot_answer", bot_answer);
             }
-    /* //user's question
-    socket.on("question", (data) => {
-        console.log("recieved question: "+data)
-        // place your bot-code here !!!
-        const fs = require('fs')
-
-        //write the question (keyword) to a text file
-        fs.writeFile('keywords.txt', data, err => {
-          if (err) {
-            console.error(err)
-            return
-          }
-        })
-        //answer of the bot
-        new_answer= "I have found several " + data + " recipes. Here are the results:"
-        socket.emit("new question", new_answer)
-        fs.readFile('sublist.txt', 'utf8', (err, data1) => {
-          if (err) {
-            console.error(err);
-            return;
-          }
-          data1 =  data1.toString().split("\n");
-          return data1;
-        });
-        //looking for the keyword in the file
-        for (let i = 0; i <  data1.length; i++) {
-            if (data1[i] == data) {
-                list = []
-                j = i + 1
-                while (data1[j].length > 30) {
-                    list += data[j]
-                }
-            }
-        }
-        //socket.emit()
-        socket.emit("list", list)
-        if (list.length < 1) {
-            answer = "I am dumb, I cannot answer to \"" + data + "\" yet, can you rephrase?";
-            socket.emit("answer", answer);
-        }
-    });*/
   }); 
+
+
+  // Ending the Chat when the user leaves
+  socket.on("disconnect", (reason) => {
+    console.log(`disconnect ${socket.id} due to ${reason}`);
+    //End of conversation
+    bye = "Goodbye! I hope I've been helpful!"
+    socket.emit("bye", bye);
+  });
 }); 
